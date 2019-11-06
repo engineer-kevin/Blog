@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>vue</title>
+</head>
+<body>
+<div id="id">
+  <span v-if="flag">
+    如果flag为true则显示,false不显示!
+  </span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script>
+  var vm = new Vue({
+    el:"#id",
+    data:{
+      flag: 0
+    }
+  })
+  console.log(vm.flag);
+</script>
+</body>
+</html>
