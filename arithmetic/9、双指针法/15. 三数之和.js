@@ -22,35 +22,35 @@
  * @param {number[]} nums
  * @return {number[][]}
  */
-var threeSum = function(nums) {
-  const len = nums.length
-  let res = []
-  if (len < 3) return res
+var threeSum = function (nums) {
+  const len = nums.length;
+  let res = [];
+  if (len < 3) return res;
 
-  nums.sort((a, b) => a - b) // 排序
+  nums.sort((a, b) => a - b); // 排序
   for (let i = 0; i < len; i++) {
-    if(nums[i] > 0) break; // 如果当前数字大于0，则三数之和一定大于0，所以结束循环
-    if (i > 0 && nums[i] === nums[i - 1]) continue // 去重
+    if (nums[i] > 0) break; // 如果当前数字大于0，则三数之和一定大于0，所以结束循环
+    if (i > 0 && nums[i] === nums[i - 1]) continue; // 去重
 
-    let l = i + 1, r = len - 1
-    
+    let l = i + 1,
+      r = len - 1;
+
     while (l < r) {
-      let sum = nums[i] + nums[l] + nums[r]
+      let sum = nums[i] + nums[l] + nums[r];
       if (sum > 0) {
-        r--
+        r--;
       } else if (sum < 0) {
-        l++
+        l++;
       } else {
-        
-        res.push([nums[i], nums[l], nums[r]])
-        while (l < r && nums[l] === nums[l + 1]) l++
-        while (l < r && nums[r] === nums[r - 1]) r-- 
-        l++
-        r--
+        res.push([nums[i], nums[l], nums[r]]);
+        while (l < r && nums[l] === nums[l + 1]) l++;
+        while (l < r && nums[r] === nums[r - 1]) r--;
+        l++;
+        r--;
       }
     }
   }
-  return res
+  return res;
 };
 
-console.log(threeSum([1,-1,-1,0]));
+console.log(threeSum([1, -1, -1, 0]));
