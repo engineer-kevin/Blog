@@ -1,12 +1,12 @@
 // 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
 
-//  
+//
 
 // 注意：
 
 // 对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。
 // 如果 s 中存在这样的子串，我们保证它是唯一的答案。
-//  
+//
 
 // 示例 1：
 
@@ -22,7 +22,7 @@
 // 输出: ""
 // 解释: t 中两个字符 'a' 均应包含在 s 的子串中，
 // 因此没有符合条件的子字符串，返回空字符串。
-//  
+//
 
 // 提示：
 
@@ -39,34 +39,33 @@
  */
 var minWindow = function (s, t) {
   const need = {};
-  const len = t.length;
-  let needCnt = len;
-  for (let char of t) { // 记录所需要的字符个数
+  const sLen = s.length;
+  let needCnt = t.length;
+  let left = 0;
+  let right = 0;
+  let start = 0;
+  let distance = sLen + 1;
+  for (let char of t) {
+    // 记录所需要的字符个数
     // need = {A:1,B:1,C:1}
     need[char] = need[char] === undefined ? 1 : ++need[char];
   }
 
-  let left = 0,
-    right = 0,
-    start = 0;
-  let distance = len + 1;
-  
-  while (right < s.length) {
+  while (right < sLen) {
     if (need[s[right]] && need[s[right]] > 0) { // 说明该字符我们需要
       needCnt--;
     }
-    // console.log(needCnt);
     // 这里将right遍历的字符都加入到了窗口中,如果是无关的字符会变成负数
     // 如果是需要的字符就会减一,出现多余的也会变成负数
     need[s[right]] = need[s[right]] === undefined ? -1 : need[s[right]] - 1;
-    // console.log(need);
     if (needCnt === 0) { // 说明区间已经拿到了所有需要的字符
-      console.log(need);
-      while (left < right && need[s[left]] < 0) {
+      // 这里有两种情况,一种是区间不需要的字符,还有一种是重复的需要字符
+      // 去掉不需要的字符和重复的需要字符的字符,缩小区间
+      while (need[s[left]] < 0) {
         need[s[left]]++;
         left++;
       }
-      console.log(left);
+
       if (right - left + 1 < distance) {
         distance = right - left + 1;
         start = left;
@@ -75,14 +74,13 @@ var minWindow = function (s, t) {
       need[s[left]]++;
       left++;
       needCnt++;
-
     }
     // 右边界右移
     right++;
   }
-  return distance === len + 1 ? "" : s.substring(start, start + distance);
+  return distance === sLen + 1 ? "" : s.substring(start, start + distance);
 };
 
-console.log(minWindow("ADOBECODEBANC",  "ABC"))
-// console.log(minWindow("a",  "a"))
-// console.log(minWindow("a",  "aa"))
+console.log(minWindow("ADOBECODEBANC", "ABC"));
+console.log(minWindow("a", "a"));
+console.log(minWindow("a", "aa"));
