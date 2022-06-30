@@ -37,17 +37,13 @@
  * @return {TreeNode}
  */
 var invertTree = function (root) {
-  if (root == null) {
-    // 遍历到null节点时，不用翻转，直接返回它本身
-    return root;
+  if (root === null) {
+    return null;
   }
-  invertTree(root.left);
-  invertTree(root.right);
-
-  const temp = root.left;
-  root.left = root.right;
-  root.right = temp;
-
+  const left = invertTree(root.left);
+  const right = invertTree(root.right);
+  root.left = right;
+  root.right = left;
   return root;
 };
 
