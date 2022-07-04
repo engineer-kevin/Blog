@@ -109,5 +109,5 @@ const array2binary = (arr) => {
 };
 
 console.log(invertTree(array2binary([4, 2, 7, 1, 3, 6, 9])));
-// console.log(invertTree(array2binary([2, 1, 3])));
-// console.log(invertTree(array2binary([])));
+console.log(invertTree(array2binary([2, 1, 3])));
+console.log(invertTree(array2binary([])));
