@@ -37,13 +37,38 @@
  * @return {TreeNode}
  */
 var invertTree = function (root) {
+  // 递归实现
+  // if (root === null) {
+  //   return null;
+  // }
+  // const left = invertTree(root.left);
+  // const right = invertTree(root.right);
+  // root.left = right;
+  // root.right = left;
+  // return root;
+  
+  // 迭代实现
   if (root === null) {
     return null;
   }
-  const left = invertTree(root.left);
-  const right = invertTree(root.right);
-  root.left = right;
-  root.right = left;
+
+  const queue = [root]; // root先入队
+  while (queue.length) {
+    const node = queue.shift(); // 出队
+    // 交互
+    const temp = node.left;
+    node.left = node.right;
+    node.right = temp;
+    // 左右子树节点入队
+    if (node.left) {
+      queue.push(node.left);
+    }
+
+    if (node.right) {
+      queue.push(node.right);
+    }
+  }
+
   return root;
 };
 
@@ -84,5 +109,5 @@ const array2binary = (arr) => {
 };
 
 console.log(invertTree(array2binary([4, 2, 7, 1, 3, 6, 9])));
-console.log(invertTree(array2binary([2, 1, 3])));
-console.log(invertTree(array2binary([])));
+// console.log(invertTree(array2binary([2, 1, 3])));
+// console.log(invertTree(array2binary([])));
