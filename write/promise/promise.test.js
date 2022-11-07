@@ -1,3 +1,8 @@
+const {
+  resolve,
+  reject
+} = require("./promise");
+
 class MyPromise {
   // 构造器
   constructor(executor) {
@@ -12,7 +17,7 @@ class MyPromise {
 
     // 成功存放的数组
     this.onResolvedCallbacks = [];
-    
+
     // 失败存放法的数组
     this.onRejectedCallbacks = [];
 
@@ -47,36 +52,53 @@ class MyPromise {
 
   // then 方法 有两个参数onFulfilled onRejected
   then(onFulfilled, onRejected) {
-    // 状态为fulfilled，执行onFulfilled，传入成功的值
-    if (this.status === 'fulfilled') {
-      onFulfilled(this.value);
-    }
+    let promise2 = new MyPromise((resolve, reject) => {
+      // 状态为fulfilled，执行onFulfilled，传入成功的值
+      if (this.status === 'fulfilled') {
+        let x = onFulfilled(this.value);
+        resolvePromise(promise2, x, resolve, reject);
+      }
 
-    // 状态为rejected，执行onRejected，传入失败的原因
-    if (this.status === 'rejected') {
-      onRejected(this.reason);
-    }
+      // 状态为rejected，执行onRejected，传入失败的原因
+      if (this.status === 'rejected') {
+        let x = onRejected(this.reason);
+        resolvePromise(promise2, x, resolve, reject);
+      }
 
-    // 当状态state为pending时, 发布订阅
-    if (this.status === 'pending') {
-      // onFulfilled传入到成功数组
-      this.onResolvedCallbacks.push(() => {
-        onFulfilled(this.value);
-      });
-      this.onRejectedCallbacks.push(() => {
-        // onRejected传入到失败数组
-        onRejected(this.reason);
-      });
-    }
+      // 当状态state为pending时, 发布订阅
+      if (this.status === 'pending') {
+        // onFulfilled传入到成功数组
+        this.onResolvedCallbacks.push(() => {
+          let x = onFulfilled(this.value);
+          resolvePromise(promise2, x, resolve, reject);
+        });
+        this.onRejectedCallbacks.push(() => {
+          // onRejected传入到失败数组
+          let x = onRejected(this.reason);
+          resolvePromise(promise2, x, resolve, reject);
+        });
+      }
+    })
+
+    return promise2;
   }
 }
 
-let p = new Promise((resolve, reject) => {
+function resolvePromise(promise2, x, resolve,  reject) {
+  
+}
 
+let p = new MyPromise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(1)
+  }, 2000)
 })
 
 p.then(res => {
-
+  console.log(res);
+  return res;
 }, err => {
-
+  console.log(err)
+}).then(res2 => {
+  console.log(res2);
 })
