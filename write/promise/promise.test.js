@@ -52,10 +52,12 @@ class MyPromise {
 
   // then 方法 有两个参数onFulfilled onRejected
   then(onFulfilled, onRejected) {
+    // 声明返回的promise2
     let promise2 = new MyPromise((resolve, reject) => {
       // 状态为fulfilled，执行onFulfilled，传入成功的值
       if (this.status === 'fulfilled') {
         let x = onFulfilled(this.value);
+        // resolvePromise函数，处理自己return的promise和默认的promise2的关系
         resolvePromise(promise2, x, resolve, reject);
       }
 
@@ -84,8 +86,44 @@ class MyPromise {
   }
 }
 
-function resolvePromise(promise2, x, resolve,  reject) {
-  
+function resolvePromise(promise2, x, resolve, reject) {
+  // 循环引用报错
+  if (promise2 === x) {
+    // reject报错
+    return reject(new TypeError('Chaining cycle detected for promise'));
+  }
+  // 防止多次调用
+  let called;
+  // x不是null 且x是对象或者函数
+  if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
+    try {
+      let then = x.then;
+      // 如果then是函数，就默认是promise了
+      if (typeof then === 'function') {
+        then.call(x, y => {
+          // 成功和失败只能调用一个 这里是否可以去掉？？？
+          if (called) return;
+          called = true;
+          resolvePromise(promise2, y, resolve, reject);
+        }, err => {
+          // 成功和失败只能调用一个
+          if (called) return;
+          called = true;
+          reject(err);
+        });
+      } else {
+        resolve(x);
+      }
+    } catch (e) {
+      // 也属于失败
+      if (called) return;
+      called = true;
+      // 取then出错了那就不要在继续执行了
+      reject(e);
+    }
+  } else {
+    resolve(x);
+  }
 }
 
 let p = new MyPromise((resolve, reject) => {
@@ -94,11 +132,31 @@ let p = new MyPromise((resolve, reject) => {
   }, 2000)
 })
 
-p.then(res => {
-  console.log(res);
-  return res;
-}, err => {
-  console.log(err)
-}).then(res2 => {
-  console.log(res2);
+let pp = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(100)
+  }, 1000)
 })
+
+let oo = pp.then((res) => {
+  return new Promise((r,f) => {
+    r(22222)
+  })
+}, e => {
+  console.log(e)
+})
+
+console.log(oo);
+
+// p.then(res => {
+//   console.log(res);
+//   return res;
+// }, err => {
+//   console.log(err)
+// }).then(res2 => {
+//   console.log(res2);
+// })
+
+// p.then(null).then(res2 => {
+//   console.log(res2);
+// })
