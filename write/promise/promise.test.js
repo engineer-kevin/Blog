@@ -1,8 +1,3 @@
-const {
-  resolve,
-  reject
-} = require("./promise");
-
 class MyPromise {
   // 构造器
   constructor(executor) {
@@ -52,32 +47,69 @@ class MyPromise {
 
   // then 方法 有两个参数onFulfilled onRejected
   then(onFulfilled, onRejected) {
+    // onFulfilled如果不是函数，就忽略onFulfilled，直接返回value
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+    // onRejected如果不是函数，就忽略onRejected，直接扔出错误
+    onRejected = typeof onRejected === 'function' ? onRejected : err => {
+      throw err
+    };
+
     // 声明返回的promise2
     let promise2 = new MyPromise((resolve, reject) => {
       // 状态为fulfilled，执行onFulfilled，传入成功的值
       if (this.status === 'fulfilled') {
-        let x = onFulfilled(this.value);
-        // resolvePromise函数，处理自己return的promise和默认的promise2的关系
-        resolvePromise(promise2, x, resolve, reject);
+        // 异步
+        setTimeout(() => {
+          try {
+            let x = onFulfilled(this.value);
+            // resolvePromise函数，处理自己return的promise和默认的promise2的关系
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        }, 0);
+
       }
 
       // 状态为rejected，执行onRejected，传入失败的原因
       if (this.status === 'rejected') {
-        let x = onRejected(this.reason);
-        resolvePromise(promise2, x, resolve, reject);
+        // 异步
+        setTimeout(() => {
+          try {
+            let x = onRejected(this.reason);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        }, 0);
       }
 
       // 当状态state为pending时, 发布订阅
       if (this.status === 'pending') {
         // onFulfilled传入到成功数组
         this.onResolvedCallbacks.push(() => {
-          let x = onFulfilled(this.value);
-          resolvePromise(promise2, x, resolve, reject);
+          // 异步
+          setTimeout(() => {
+            try {
+              let x = onFulfilled(this.value);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          }, 0);
         });
+
+        // onRejected传入到失败数组
         this.onRejectedCallbacks.push(() => {
-          // onRejected传入到失败数组
-          let x = onRejected(this.reason);
-          resolvePromise(promise2, x, resolve, reject);
+          // 异步
+          setTimeout(() => {
+            try {
+              let x = onRejected(this.reason);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          }, 0);
         });
       }
     })
@@ -126,27 +158,40 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 
+// all方法
+MyPromise.all = (promises) => {
+
+}
+
+let p0 = new MyPromise((resolve, reject) => {
+  resolve(1)
+})
+
 let p = new MyPromise((resolve, reject) => {
   setTimeout(() => {
-    resolve(1)
+    resolve(1000)
   }, 2000)
 })
 
-let pp = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    resolve(100)
-  }, 1000)
-})
+// MyPromise.all(([p0, p])).then((o, r) => {
+//   console.log([o, r]);
+// })
 
-let oo = pp.then((res) => {
-  return new Promise((r,f) => {
-    r(22222)
-  })
-}, e => {
-  console.log(e)
-})
+// let pp = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve(100)
+//   }, 1000)
+// })
 
-console.log(oo);
+// let oo = pp.then((res) => {
+//   return new Promise((r, f) => {
+//     r(22222)
+//   })
+// }, e => {
+//   console.log(e)
+// })
+
+// console.log(oo);
 
 // p.then(res => {
 //   console.log(res);
@@ -160,3 +205,14 @@ console.log(oo);
 // p.then(null).then(res2 => {
 //   console.log(res2);
 // })
+
+MyPromise.defer = MyPromise.deferred = function () {
+  let dfd = {}
+  dfd.promise = new MyPromise((resolve, reject) => {
+    dfd.resolve = resolve;
+    dfd.reject = reject;
+  });
+  return dfd;
+}
+
+module.exports = MyPromise;
