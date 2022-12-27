@@ -45,8 +45,9 @@
  * @return {TreeNode}
  */
 var lowestCommonAncestor = function (root, p, q) {
-  if (root === null) return null;
-  if (root === p || root === q) return root;
+  if (root === null) return null; // 遇到null，返回null 没有LCA
+  if (root === p || root === q) return root; // 遇到p或q，直接返回当前节点
+  // 非null 非q 非p，则递归左右子树
   const left = lowestCommonAncestor(root.left, p, q);
   const right = lowestCommonAncestor(root.right, p, q);
   if (left !== null && right !== null) return root;
