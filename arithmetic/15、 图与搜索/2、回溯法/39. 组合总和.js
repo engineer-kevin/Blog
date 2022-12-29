@@ -54,10 +54,8 @@ var combinationSum = function (candidates, target) {
       const val = candidates[i];
       if (sum + val > target) break;
       path.push(val);
-      sum += val;
-      dfs(path, sum, i);
+      dfs(path, sum + val, i);
       path.pop();
-      sum -= val;
     }
   }
   dfs([], 0, 0);
@@ -65,3 +63,4 @@ var combinationSum = function (candidates, target) {
 };
 
 console.log(combinationSum([2, 6, 3, 7], 7));
+console.log(combinationSum([2, 3, 5], 8));
