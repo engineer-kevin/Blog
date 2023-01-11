@@ -28,7 +28,7 @@
 
 // 提示：
 
-// m == grid.length
+// m == row
 // n == grid[i].length
 // 1 <= m, n <= 300
 // grid[i][j] 的值为 '0' 或 '1'
@@ -44,7 +44,7 @@ var numIslands = function (grid) {
   // // 深度优先搜索实现
   // function dfs(grid, i, j) {
   //   // 判断越界或者当前节点为0
-  //   if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || grid[i][j] === "0") return;
+  //   if (i < 0 || i >= row || j < 0 || j >= col || grid[i][j] === "0") return;
 
   //   grid[i][j] = "0";
   //   dfs(grid, i - 1, j); // 上
@@ -54,11 +54,11 @@ var numIslands = function (grid) {
   // }
 
   // let res = 0;
-  // const grid.length = grid.length;
-  // const grid[0].length = grid[0].length;
+  // const row = row;
+  // const col = col;
 
-  // for (let i = 0; i < grid.length; i++) {
-  //   for (let j = 0; j < grid[0].length; j++) {
+  // for (let i = 0; i < row; i++) {
+  //   for (let j = 0; j < col; j++) {
   //     // 遇到"1",岛屿数量加1
   //     if (grid[i][j] === "1") {
   //       ++res;
@@ -71,48 +71,42 @@ var numIslands = function (grid) {
 
   // 广度优先搜索实现
   let count = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[0].length; j++) {
+  const row = grid.length;
+  const col = grid[0].length;
+  for (let i = 0; i < row; i++) {
+    for (let j = 0; j < col; j++) {
       if (grid[i][j] === "1") {
         ++count;
-        grid[i][j] = "0"; // 做标记，避免重复遍历
-        const queue = [];
-        queue.push([i, j]);
-        bfs(queue, grid);
+        const queue = [[i, j]];
+        // bfs(queue, grid);
+        const dirs = [
+          [-1, 0],
+          [0, 1],
+          [1, 0],
+          [0, -1],
+        ]; // 上、右、下、左
+        while (queue.length) {
+          const [x, y] = queue.shift();
+          if (x < 0 || x >= row || y < 0 || y >= col || grid[x][y] === "0") {
+            continue;
+          }
+
+          grid[x][y] = "0"; // 做标记，避免重复遍历
+
+          for (let [r, c] of dirs) {
+            const xr = x + r;
+            const yc = y + c;
+
+            // grid[i][j] = "0";
+            queue.push([xr, yc]);
+          }
+        }
       }
     }
   }
 
   return count;
 };
-
-function bfs(queue, grid) {
-  const dirs = [
-    [-1, 0],
-    [0, 1],
-    [1, 0],
-    [0, -1],
-  ]; // 上、右、下、左
-  while (queue.length) {
-    const cur = queue.shift();
-    for (let dir of dirs) {
-      const i = cur[0] + dir[0];
-      const j = cur[1] + dir[1];
-      if (
-        i < 0 ||
-        i >= grid.length ||
-        j < 0 ||
-        j >= grid[0].length ||
-        grid[i][j] === "0"
-      ) {
-        continue;
-      }
-
-      grid[i][j] = "0";
-      queue.push([i, j]);
-    }
-  }
-}
 
 console.log(
   numIslands([
@@ -129,5 +123,12 @@ console.log(
     ["1", "1", "0", "0", "0"],
     ["0", "0", "1", "0", "0"],
     ["0", "0", "0", "1", "1"],
+  ])
+);
+
+console.log(
+  numIslands([
+    ["1", "1", "0"],
+    ["0", "0", "1"],
   ])
 );
