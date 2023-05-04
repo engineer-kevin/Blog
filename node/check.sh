@@ -11,5 +11,9 @@
 # mv index.html indexmv.html 
 
 # 输出内容到文件夹
-tem=`node timer.js`
-echo ${tem} > out.txt
+# tem=`node timer.js`
+# echo ${tem} > out.txt
+
+# node timer.js --message "洪荒之力！" --time 5
+
+npm test
