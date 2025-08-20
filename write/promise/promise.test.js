@@ -2,7 +2,7 @@ class MyPromise {
   // 构造器
   constructor(executor) {
     // 初始化state为等待态
-    this.status = "pending";
+    this.status = 'pending';
 
     // 成功的值
     this.value = undefined;
@@ -18,8 +18,8 @@ class MyPromise {
 
     // 成功
     let resolve = (value) => {
-      if (this.status === "pending") {
-        this.status = "fulfilled";
+      if (this.status === 'pending') {
+        this.status = 'fulfilled';
         this.value = value;
         // 一旦resolve执行，调用成功数组的函数
         this.onResolvedCallbacks.forEach((fn) => fn());
@@ -28,8 +28,8 @@ class MyPromise {
 
     // 失败
     let reject = (reason) => {
-      if (this.status === "pending") {
-        this.status = "rejected";
+      if (this.status === 'pending') {
+        this.status = 'rejected';
         this.reason = reason;
         // 一旦reject执行，调用失败数组的函数
         this.onRejectedCallbacks.forEach((fn) => fn());
@@ -49,10 +49,10 @@ class MyPromise {
   then(onFulfilled, onRejected) {
     // onFulfilled如果不是函数，就忽略onFulfilled，直接返回value
     onFulfilled =
-      typeof onFulfilled === "function" ? onFulfilled : (value) => value;
+      typeof onFulfilled === 'function' ? onFulfilled : (value) => value;
     // onRejected如果不是函数，就忽略onRejected，直接扔出错误
     onRejected =
-      typeof onRejected === "function"
+      typeof onRejected === 'function'
         ? onRejected
         : (err) => {
             throw err;
@@ -61,7 +61,7 @@ class MyPromise {
     // 声明返回的promise2
     let promise2 = new MyPromise((resolve, reject) => {
       // 状态为fulfilled，执行onFulfilled，传入成功的值
-      if (this.status === "fulfilled") {
+      if (this.status === 'fulfilled') {
         // 异步
         setTimeout(() => {
           try {
@@ -75,7 +75,7 @@ class MyPromise {
       }
 
       // 状态为rejected，执行onRejected，传入失败的原因
-      if (this.status === "rejected") {
+      if (this.status === 'rejected') {
         // 异步
         setTimeout(() => {
           try {
@@ -88,7 +88,7 @@ class MyPromise {
       }
 
       // 当状态state为pending时, 发布订阅
-      if (this.status === "pending") {
+      if (this.status === 'pending') {
         // onFulfilled传入到成功数组
         this.onResolvedCallbacks.push(() => {
           // 异步
@@ -119,22 +119,61 @@ class MyPromise {
 
     return promise2;
   }
+
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
+
+  finally(onFinally) {
+    return this.then(
+      (value) => {
+        return MyPromise.resolve(onFinally()).then(() => value);
+      },
+      (reason) => {
+        return MyPromise.resolve(onFinally()).then(() => {
+          throw reason;
+        });
+      }
+    );
+  }
+
+  static resolve(value) {
+    return new MyPromise((resolve) => resolve(value));
+  }
+
+  static reject(reason) {
+    return new MyPromise((_, reject) => reject(reason));
+  }
+
+  static all(promises) {
+    let arr = [];
+    let count = 0;
+    return new MyPromise((resolve, reject) => {
+      promises.forEach((item, i) => {
+        Promise.resolve(item).then((res) => {
+          arr[i] = res;
+          count += 1;
+          if (count === promises.length) resolve(arr);
+        }, reject);
+      });
+    });
+  }
 }
 
 function resolvePromise(promise2, x, resolve, reject) {
   // 循环引用报错
   if (promise2 === x) {
     // reject报错
-    return reject(new TypeError("Chaining cycle detected for promise"));
+    return reject(new TypeError('Chaining cycle detected for promise'));
   }
   // 防止多次调用
   let called;
   // x不是null 且x是对象或者函数
-  if (x !== null && (typeof x === "object" || typeof x === "function")) {
+  if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
     try {
       let then = x.then;
       // 如果then是函数，就默认是promise了
-      if (typeof then === "function") {
+      if (typeof then === 'function') {
         then.call(
           x,
           (y) => {
@@ -164,21 +203,6 @@ function resolvePromise(promise2, x, resolve, reject) {
     resolve(x);
   }
 }
-
-// all方法
-MyPromise.all = function (promises) {
-  let arr = [];
-  let count = 0;
-  return new MyPromise((resolve, reject) => {
-    promises.forEach((item, i) => {
-      Promise.resolve(item).then((res) => {
-        arr[i] = res;
-        count += 1;
-        if (count === promises.length) resolve(arr);
-      }, reject);
-    });
-  });
-};
 
 // MyPromise.all(([p0, p])).then((o, r) => {
 //   console.log([o, r]);
@@ -213,17 +237,17 @@ MyPromise.all = function (promises) {
 //   console.log(res2);
 // })
 
-const p1 = Promise.resolve("p1");
+const p1 = Promise.resolve('p1');
 
 const p2 = new Promise((resolve, reject) => {
   setTimeout(() => {
-    resolve("p2 延时一秒");
+    resolve('p2 延时一秒');
   }, 1000);
 });
 
 const p3 = new Promise((resolve, reject) => {
   setTimeout(() => {
-    resolve("p3 延时两秒");
+    resolve('p3 延时两秒');
   }, 2000);
 });
 
